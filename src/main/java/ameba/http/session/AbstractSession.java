@@ -9,10 +9,18 @@ import java.util.Map;
  */
 public abstract class AbstractSession {
 
-    protected AbstractSession(String id, long timeout) {
+
+    protected long timeout;
+    protected boolean isNew;
+    protected String id;
+
+    protected AbstractSession(String id, long timeout, boolean isNew) {
         if (StringUtils.isBlank(id)) throw new SessionExcption("session id is invalid");
         setId(id);
         if (!id.equals(getId())) throw new SessionExcption("session id is invalid");
+
+        this.timeout = timeout;
+        this.isNew = isNew;
     }
 
     /**
@@ -55,9 +63,13 @@ public abstract class AbstractSession {
      * @return a string specifying the identifier
      * assigned to this session
      */
-    public abstract String getId();
+    public String getId(){
+        return id;
+    }
 
-    protected abstract void setId(String id);
+    protected void setId(String id){
+        this.id = id;
+    }
 
     /**
      * Return a long representing the maximum idle time (in milliseconds) a session can be.
@@ -71,6 +83,11 @@ public abstract class AbstractSession {
      * to it.
      */
     public abstract void invalidate();
+
+    /**
+     * get this session is invalid
+     */
+    public abstract boolean isInvalid();
 
     /**
      * @return the timestamp when this session has been created.
@@ -87,4 +104,7 @@ public abstract class AbstractSession {
      */
     public abstract void refresh();
 
+    public boolean isNew() {
+        return isNew;
+    }
 }

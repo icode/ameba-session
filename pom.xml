@@ -137,6 +137,11 @@
             <artifactId>ameba-cache-core</artifactId>
             <version>${ameba.cache.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.9</version>
+        </dependency>
     </dependencies>
 
     <properties>

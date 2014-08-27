@@ -2,7 +2,6 @@ package ameba.http.session;
 
 import ameba.cache.Cache;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -11,18 +10,15 @@ import java.util.Map;
 public class CacheSession extends AbstractSession {
     private static final String SESSION_PRE_KEY = CacheSession.class.getName() + ".__SESSION__.";
 
-    private String id;
-    private Session session;
-    private long timeout;
+    private SessionStore session;
 
-    protected CacheSession(String id, long timeout) {
-        super(id, timeout);
-        this.timeout = timeout;
+    protected CacheSession(String id, long timeout, boolean isNew) {
+        super(id, timeout, isNew);
     }
 
     @Override
     public void setAttribute(String key, Object value) {
-        Session session = getSession();
+        SessionStore session = getSession();
         session.attributes.put(key, value);
         flush();
     }
@@ -41,21 +37,11 @@ public class CacheSession extends AbstractSession {
     @Override
     @SuppressWarnings("unchecked")
     public <V> V removeAttribute(String key) {
-        Session session = getSession();
+        SessionStore session = getSession();
         V value = (V) session.attributes.remove(key);
         if (value != null)
             flush();
         return value;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    protected void setId(String id) {
-        this.id = id;
     }
 
     @Override
@@ -69,14 +55,19 @@ public class CacheSession extends AbstractSession {
     }
 
     @Override
+    public boolean isInvalid() {
+        refresh();
+        return session == null;
+    }
+
+    @Override
     public long getTimestamp() {
         return getSession().timestamp;
     }
 
     @Override
     public void flush() {
-        if (session != null)
-            setSession(session);
+        setSession(getSession());
     }
 
     @Override
@@ -84,23 +75,22 @@ public class CacheSession extends AbstractSession {
         session = Cache.gat(getKey(), (int) (timeout * 1000));
     }
 
-    private Session getSession() {
+    private SessionStore getSession() {
         if (session == null) {
             synchronized (this) {
                 if (session == null) {
                     refresh();
                 }
                 if (session == null) {
-                    session = new Session();
+                    session = new SessionStore();
                     session.timestamp = System.currentTimeMillis();
-                    flush();
                 }
             }
         }
         return session;
     }
 
-    private void setSession(Session session) {
+    private void setSession(SessionStore session) {
         Cache.syncSet(getKey(), session, (int) (timeout * 1000));
     }
 
@@ -108,8 +98,4 @@ public class CacheSession extends AbstractSession {
         return SESSION_PRE_KEY + getId();
     }
 
-    private class Session implements Serializable {
-        Map<String, Object> attributes;
-        long timestamp;
-    }
 }

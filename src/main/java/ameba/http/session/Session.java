@@ -1,6 +1,4 @@
-package ameba.http;
-
-import ameba.http.session.AbstractSession;
+package ameba.http.session;
 
 /**
  * @author icode

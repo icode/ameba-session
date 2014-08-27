@@ -4,6 +4,7 @@ import ameba.util.Times;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Priority;
+import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -21,6 +22,7 @@ import java.util.UUID;
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION - 1)
+@Singleton
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
     static String DEFAULT_SESSION_ID_COOKIE_KEY = "SID";
     static long SESSION_TIMEOUT = Times.parseDuration("1h") * 1000;

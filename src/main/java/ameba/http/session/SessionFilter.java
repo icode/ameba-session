@@ -76,7 +76,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
                 requestContext.getUriInfo().getBaseUri().getPath(),
                 null,
                 Cookie.DEFAULT_VERSION, null,
-                (int) (SESSION_TIMEOUT / 1000),
+                NewCookie.DEFAULT_MAX_AGE,
                 null, false, true);
 
 

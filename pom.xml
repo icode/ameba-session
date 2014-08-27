@@ -125,4 +125,23 @@
         </repository>
     </distributionManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${jaxrs.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.amebastack.module</groupId>
+            <artifactId>ameba-cache-core</artifactId>
+            <version>${ameba.cache.version}</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <ameba.cache.version>0.1.0</ameba.cache.version>
+        <jaxrs.api.version>2.0</jaxrs.api.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 </project>

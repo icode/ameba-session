@@ -139,6 +139,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.amebastack</groupId>
+            <artifactId>ameba</artifactId>
+            <version>${ameba.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.9</version>
@@ -146,6 +152,7 @@
     </dependencies>
 
     <properties>
+        <ameba.version>0.1.6a</ameba.version>
         <ameba.cache.version>0.1.1</ameba.cache.version>
         <jaxrs.api.version>2.0</jaxrs.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

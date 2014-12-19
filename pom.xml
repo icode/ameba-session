@@ -6,7 +6,7 @@
 
     <groupId>org.amebastack.module</groupId>
     <artifactId>ameba-session</artifactId>
-    <version>0.1.6</version>
+    <version>0.1.6e</version>
 
 
     <name>Ameba-Framework-Session</name>
@@ -18,21 +18,21 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>https://raw.githubusercontent.com/intelligentcode/ameba-session/master/LICENSE</url>
+            <url>https://raw.githubusercontent.com/icode/ameba-session/master/LICENSE</url>
             <distribution>repo</distribution>
             <comments>The MIT License (MIT)</comments>
         </license>
     </licenses>
 
     <scm>
-        <url>https://github.com/intelligentcode/ameba-session</url>
-        <connection>scm:git:https://github.com/intelligentcode/ameba-session.git</connection>
-        <developerConnection>scm:git:git@github.com:intelligentcode/ameba-session.git</developerConnection>
+        <url>https://github.com/icode/ameba-session</url>
+        <connection>scm:git:https://github.com/icode/ameba-session.git</connection>
+        <developerConnection>scm:git:git@github.com:icode/ameba-session.git</developerConnection>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/intelligentcode/ameba-session/issues</url>
+        <url>https://github.com/icode/ameba-session/issues</url>
     </issueManagement>
 
     <developers>
@@ -127,12 +127,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${jaxrs.api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.amebastack.module</groupId>
             <artifactId>ameba-cache-core</artifactId>
             <version>${ameba.cache.version}</version>
@@ -152,8 +146,8 @@
     </dependencies>
 
     <properties>
-        <ameba.version>0.1.6a</ameba.version>
-        <ameba.cache.version>0.1.1</ameba.cache.version>
+        <ameba.version>0.1.6e</ameba.version>
+        <ameba.cache.version>0.1.2</ameba.cache.version>
         <jaxrs.api.version>2.0</jaxrs.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

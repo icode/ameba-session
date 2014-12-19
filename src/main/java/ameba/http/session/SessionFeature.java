@@ -35,11 +35,12 @@ public class SessionFeature implements Feature {
 
             String sessionClassStr = (String) configuration.getProperty("http.session.class");
             if (StringUtils.isNotBlank(sessionClassStr)) {
-                Class sessionClass = ClassUtils.forName(sessionClassStr);
-
                 try {
+                    Class sessionClass = ClassUtils.getClass(sessionClassStr);
                     SessionFilter.SESSION_IMPL_CONSTRUCTOR = sessionClass.getDeclaredConstructor(String.class, long.class, boolean.class);
                 } catch (NoSuchMethodException e) {
+                    throw new SessionExcption("new session instance error");
+                } catch (ClassNotFoundException e) {
                     throw new SessionExcption("new session instance error");
                 }
             }

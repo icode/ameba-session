@@ -1,16 +1,26 @@
 package ameba.http.session;
 
+import java.lang.invoke.MethodHandle;
+
 /**
  * @author icode
  */
 public class Session {
 
-    static final ThreadLocal<AbstractSession> sessionThreadLocal = new ThreadLocal<AbstractSession>();
+    static final ThreadLocal<AbstractSession> sessionThreadLocal = new ThreadLocal<>();
+    static MethodHandle GET_SESSION_METHOD_HANDLE;
 
     public static AbstractSession get() {
         return sessionThreadLocal.get();
     }
 
+    public static AbstractSession get(String id) {
+        try {
+            return (AbstractSession) GET_SESSION_METHOD_HANDLE.invoke(id);
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
 
     /**
      * Add an attribute to this session.

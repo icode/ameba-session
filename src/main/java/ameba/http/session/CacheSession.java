@@ -10,38 +10,41 @@ import java.util.Map;
 public class CacheSession extends AbstractSession {
     private static final String SESSION_PRE_KEY = CacheSession.class.getName() + ".__SESSION__.";
 
-    private SessionStore session;
+    private SessionStore store;
+    private boolean fetched = false;
 
     protected CacheSession(String id, long timeout, boolean isNew) {
         super(id, timeout, isNew);
     }
 
+    public static AbstractSession get(String id) {
+        return Cache.get(getKey(id));
+    }
+
+    private static String getKey(String id) {
+        return SESSION_PRE_KEY + id;
+    }
+
     @Override
     public void setAttribute(String key, Object value) {
-        SessionStore session = getSession();
-        session.attributes.put(key, value);
-        flush();
+        getStore().attributes.put(key, value);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <V> V getAttribute(String key) {
-        return (V) getSession().attributes.get(key);
+        return (V) getStore().attributes.get(key);
     }
 
     @Override
     public Map<String, Object> getAttributes() {
-        return getSession().attributes;
+        return getStore().attributes;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <V> V removeAttribute(String key) {
-        SessionStore session = getSession();
-        V value = (V) session.attributes.remove(key);
-        if (value != null)
-            flush();
-        return value;
+        return (V) getStore().attributes.remove(key);
     }
 
     @Override
@@ -56,46 +59,55 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public boolean isInvalid() {
-        refresh();
-        return session == null;
+        if (isNew) {
+            return false;
+        }
+        if (store == null) {
+            refresh(false);
+        }
+        return store == null;
     }
 
     @Override
     public long getTimestamp() {
-        return getSession().timestamp;
+        return getStore().timestamp;
     }
 
     @Override
     public void flush() {
-        setSession(getSession());
+        if (store != null && store.isChange)
+            Cache.syncSet(getKey(), store, (int) (timeout * 1000));
     }
 
     @Override
     public void refresh() {
-        session = Cache.gat(getKey(), (int) (timeout * 1000));
+        refresh(true);
     }
 
-    private SessionStore getSession() {
-        if (session == null) {
+    public void refresh(boolean force) {
+        if (!fetched || force) {
+            store = Cache.gat(getKey(), (int) (timeout * 1000));
+            fetched = true;
+        }
+    }
+
+    private SessionStore getStore() {
+        if (store == null) {
             synchronized (this) {
-                if (session == null) {
-                    refresh();
+                if (store == null) {
+                    refresh(false);
                 }
-                if (session == null) {
-                    session = new SessionStore();
-                    session.timestamp = System.currentTimeMillis();
+                if (store == null) {
+                    store = new SessionStore();
+                    store.timestamp = System.currentTimeMillis();
                 }
             }
         }
-        return session;
-    }
-
-    private void setSession(SessionStore session) {
-        Cache.syncSet(getKey(), session, (int) (timeout * 1000));
+        return store;
     }
 
     private String getKey() {
-        return SESSION_PRE_KEY + getId();
+        return getKey(getId());
     }
 
 }

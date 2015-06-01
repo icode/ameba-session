@@ -9,7 +9,6 @@ import java.util.Map;
  */
 public abstract class AbstractSession {
 
-
     protected long timeout;
     protected boolean isNew;
     protected String id;
@@ -17,10 +16,13 @@ public abstract class AbstractSession {
     protected AbstractSession(String id, long timeout, boolean isNew) {
         if (StringUtils.isBlank(id)) throw new SessionExcption("session id is invalid");
         setId(id);
-        if (!id.equals(getId())) throw new SessionExcption("session id is invalid");
 
         this.timeout = timeout;
         this.isNew = isNew;
+    }
+
+    public static AbstractSession get(String id) {
+        return null;
     }
 
     /**
@@ -63,11 +65,11 @@ public abstract class AbstractSession {
      * @return a string specifying the identifier
      * assigned to this session
      */
-    public String getId(){
+    public String getId() {
         return id;
     }
 
-    protected void setId(String id){
+    protected void setId(String id) {
         this.id = id;
     }
 

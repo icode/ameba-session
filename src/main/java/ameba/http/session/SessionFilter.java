@@ -15,6 +15,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.Provider;
 import java.lang.invoke.MethodHandle;
+import java.net.URI;
 import java.util.UUID;
 
 /**
@@ -68,14 +69,17 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
     }
 
     private NewCookie newCookie(ContainerRequestContext requestContext) {
+        URI uri = requestContext.getUriInfo().getBaseUri();
         NewCookie cookie = new NewCookie(
                 DEFAULT_SESSION_ID_COOKIE_KEY,
                 newSessionId(),
-                requestContext.getUriInfo().getBaseUri().getPath(),
-                null,
+                uri.getPath(),
+                uri.getHost(),
                 Cookie.DEFAULT_VERSION, null,
                 COOKIE_MAX_AGE,
-                null, requestContext.getSecurityContext().isSecure(), true);
+                null,
+                requestContext.getSecurityContext().isSecure(),
+                true);
 
 
         requestContext.setProperty(SET_COOKIE_KEY, cookie);

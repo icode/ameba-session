@@ -58,7 +58,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         Session.sessionThreadLocal.set(session);
     }
 
-    private String newSessionId() {
+    protected String newSessionId() {
         return Hashing.sha1()
                 .hashString(
                         UUID.randomUUID().toString() + Math.random() + this.hashCode() + System.nanoTime(),

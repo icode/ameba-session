@@ -21,7 +21,10 @@ public class SessionFeature implements Feature {
     public boolean configure(FeatureContext context) {
         Configuration configuration = context.getConfiguration();
         if (!context.getConfiguration().isRegistered(SessionFilter.class)) {
-            SessionFilter.DEFAULT_SESSION_ID_COOKIE_KEY = (String) configuration.getProperty("http.session.cookie.key");
+            String key = (String) configuration.getProperty("http.session.cookie.key");
+            if (StringUtils.isNotBlank(key)) {
+                SessionFilter.DEFAULT_SESSION_ID_COOKIE_KEY = key;
+            }
             String sessionTimeout = (String) configuration.getProperty("http.session.timeout");
             try {
                 Integer timeout = parseTime(sessionTimeout);

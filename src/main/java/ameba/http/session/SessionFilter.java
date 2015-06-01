@@ -75,7 +75,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
                 null,
                 Cookie.DEFAULT_VERSION, null,
                 COOKIE_MAX_AGE,
-                null, false, true);
+                null, requestContext.getSecurityContext().isSecure(), true);
 
 
         requestContext.setProperty(SET_COOKIE_KEY, cookie);

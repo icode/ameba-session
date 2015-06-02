@@ -7,13 +7,9 @@ import com.google.common.hash.Hashing;
 import javax.annotation.Priority;
 import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.ext.Provider;
 import java.lang.invoke.MethodHandle;
 import java.net.URI;
 import java.util.UUID;
@@ -21,7 +17,7 @@ import java.util.UUID;
 /**
  * @author icode
  */
-@Provider
+@PreMatching
 @Priority(Priorities.AUTHENTICATION - 1)
 @Singleton
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {

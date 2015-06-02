@@ -8,7 +8,7 @@ import java.util.Map;
  * @author icode
  */
 class SessionStore implements Serializable {
-    boolean isChange = false;
+    transient boolean isChange = false;
     Map<String, Object> attributes = new HashMap<String, Object>() {
 
         @Override

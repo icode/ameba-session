@@ -12,6 +12,7 @@ public class CacheSession extends AbstractSession {
 
     private SessionStore store;
     private boolean fetched = false;
+    private boolean isDelete = false;
 
     protected CacheSession(String id, long timeout, boolean isNew) {
         super(id, timeout, isNew);
@@ -55,6 +56,7 @@ public class CacheSession extends AbstractSession {
     @Override
     public void invalidate() {
         Cache.syncDelete(getKey());
+        isDelete = true;
     }
 
     @Override
@@ -75,8 +77,12 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public void flush() {
-        if (store != null && store.isChange)
+        if (!isDelete && store == null)
+            getStore();
+        if (store != null && store.isChange) {
+            store.isChange = false;
             Cache.syncSet(getKey(), store, (int) (timeout * 1000));
+        }
     }
 
     @Override
@@ -100,6 +106,7 @@ public class CacheSession extends AbstractSession {
                 if (store == null) {
                     store = new SessionStore();
                     store.timestamp = System.currentTimeMillis();
+                    store.isChange = true;
                 }
             }
         }

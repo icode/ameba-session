@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author icode
  */
 @PreMatching
-@Priority(Priorities.AUTHENTICATION - 1)
+@Priority(Priorities.AUTHENTICATION - 500)
 @Singleton
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";

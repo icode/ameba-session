@@ -40,7 +40,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         }
         AbstractSession session;
         String host = Requests.getRemoteRealAddr();
-        if (host.equals("unknown")) {
+        if (host == null || host.equals("unknown")) {
             host = Requests.getRemoteAddr();
         }
         String sessionId = cookie.getValue();

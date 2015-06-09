@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import java.lang.invoke.MethodHandle;
 import java.net.URI;
@@ -97,6 +98,6 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         NewCookie cookie = (NewCookie) requestContext.getProperty(SET_COOKIE_KEY);
 
         if (cookie != null)
-            responseContext.getHeaders().add("Set-Cookie", cookie.toString());
+            responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }

@@ -1,6 +1,7 @@
 package ameba.http.session;
 
 import java.lang.invoke.MethodHandle;
+import java.util.Map;
 
 /**
  * @author icode
@@ -28,7 +29,7 @@ public class Session {
      * @param key   key
      * @param value value
      */
-    public static void setAttribute(String key, Object value) {
+    public static void setAttribute(Object key, Object value) {
         get().setAttribute(key, value);
     }
 
@@ -38,8 +39,17 @@ public class Session {
      * @param key key
      * @return an attribute
      */
-    public static <V> V getAttribute(String key) {
+    public static <V> V getAttribute(Object key) {
         return get().getAttribute(key);
+    }
+
+    /**
+     * Return attributes.
+     *
+     * @return attributes
+     */
+    public static Map<Object, Object> getAttributes() {
+        return get().getAttributes();
     }
 
 
@@ -49,7 +59,7 @@ public class Session {
      * @param key key
      * @return true if successful.
      */
-    public static <V> V removeAttribute(String key) {
+    public static <V> V removeAttribute(Object key) {
         return get().removeAttribute(key);
     }
 
@@ -70,8 +80,12 @@ public class Session {
      *
      * @return a long representing the maximum idle time (in milliseconds) a session can be.
      */
-    public static long getSessionTimeout() {
-        return get().getSessionTimeout();
+    public static long getTimeout() {
+        return get().getTimeout();
+    }
+
+    public static void setTimeout(long timeout) {
+        get().setTimeout(timeout);
     }
 
     /**
@@ -96,7 +110,19 @@ public class Session {
         get().flush();
     }
 
-    public void refresh() {
+    public static void refresh() {
         get().refresh();
+    }
+
+    public static void touch() {
+        get().touch();
+    }
+
+    public static long getLastAccessTime() {
+        return get().getLastAccessTime();
+    }
+
+    public static String getHost() {
+        return get().getHost();
     }
 }

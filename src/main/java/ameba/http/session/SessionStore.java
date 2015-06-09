@@ -8,12 +8,13 @@ import java.util.Map;
  * @author icode
  */
 class SessionStore implements Serializable {
-    transient boolean isChange = false;
-    Map<String, Object> attributes = new HashMap<String, Object>() {
+    private transient boolean change = false;
+    private long lastAccessTime;
+    private Map<Object, Object> attributes = new HashMap<Object, Object>() {
 
         @Override
-        public Object put(String key, Object value) {
-            isChange = true;
+        public Object put(Object key, Object value) {
+            change = true;
             return super.put(key, value);
         }
 
@@ -24,17 +25,58 @@ class SessionStore implements Serializable {
 
         @Override
         public void clear() {
-            isChange = true;
+            change = true;
             super.clear();
         }
 
         @Override
-        public void putAll(Map<? extends String, ?> m) {
+        public void putAll(Map<?, ?> m) {
             if (m != null && !m.isEmpty()) {
-                isChange = true;
+                change = true;
             }
             super.putAll(m);
         }
     };
-    long timestamp;
+    private long timestamp;
+    private long timeout;
+
+    public SessionStore(long timeout) {
+        this.timestamp = System.currentTimeMillis();
+        this.timeout = timeout;
+        this.change = true;
+        this.lastAccessTime = timestamp;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.change = true;
+        this.timeout = timeout;
+    }
+
+    public boolean isChange() {
+        return change;
+    }
+
+    public void unchange() {
+        change = false;
+    }
+
+    public Map<Object, Object> getAttributes() {
+        return attributes;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public long getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    public void updateLastAccessTime() {
+        this.lastAccessTime = System.currentTimeMillis();
+    }
 }

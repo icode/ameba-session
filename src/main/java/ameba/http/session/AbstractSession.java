@@ -9,15 +9,16 @@ import java.util.Map;
  */
 public abstract class AbstractSession {
 
-    protected long timeout;
+    protected long defaultTimeout;
     protected boolean isNew;
+    protected String host;
     protected String id;
 
-    protected AbstractSession(String id, long timeout, boolean isNew) {
+    protected AbstractSession(String id, String host, long defaultTimeout, boolean isNew) {
         if (StringUtils.isBlank(id)) throw new SessionExcption("session id is invalid");
         setId(id);
-
-        this.timeout = timeout;
+        this.host = host;
+        this.defaultTimeout = defaultTimeout;
         this.isNew = isNew;
     }
 
@@ -31,7 +32,7 @@ public abstract class AbstractSession {
      * @param key   key
      * @param value value
      */
-    public abstract void setAttribute(String key, Object value);
+    public abstract void setAttribute(Object key, Object value);
 
     /**
      * Return an attribute.
@@ -39,14 +40,14 @@ public abstract class AbstractSession {
      * @param key key
      * @return an attribute
      */
-    public abstract <V> V getAttribute(String key);
+    public abstract <V> V getAttribute(Object key);
 
     /**
      * Return all attributes.
      *
      * @return an attribute
      */
-    public abstract Map<String, Object> getAttributes();
+    public abstract Map<Object, Object> getAttributes();
 
 
     /**
@@ -55,7 +56,7 @@ public abstract class AbstractSession {
      * @param key key
      * @return true if successful.
      */
-    public abstract <V> V removeAttribute(String key);
+    public abstract <V> V removeAttribute(Object key);
 
     /**
      * Returns a string containing the unique identifier assigned
@@ -78,7 +79,11 @@ public abstract class AbstractSession {
      *
      * @return a long representing the maximum idle time (in milliseconds) a session can be.
      */
-    public abstract long getSessionTimeout();
+    public long getTimeout() {
+        return defaultTimeout;
+    }
+
+    public abstract void setTimeout(long maxIdleTimeInMillis);
 
     /**
      * Invalidates this session then unbinds any objects bound
@@ -106,7 +111,18 @@ public abstract class AbstractSession {
      */
     public abstract void refresh();
 
+    /**
+     * touch session
+     */
+    public abstract void touch();
+
     public boolean isNew() {
         return isNew;
     }
+
+    public String getHost() {
+        return host;
+    }
+
+    public abstract long getLastAccessTime();
 }

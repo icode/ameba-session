@@ -50,7 +50,7 @@ public class SessionFeature implements Feature {
                 try {
                     Class sessionClass = ClassUtils.getClass(sessionClassStr);
                     SessionFilter.METHOD_HANDLE = MethodHandles.lookup().findConstructor(sessionClass,
-                            MethodType.methodType(void.class, String.class, long.class, boolean.class));
+                            MethodType.methodType(void.class, String.class, String.class, long.class, boolean.class));
                     setGetSessionHandle(sessionClass);
                 } catch (NoSuchMethodException | ClassNotFoundException | IllegalAccessException e) {
                     throw new SessionExcption("new session instance error");

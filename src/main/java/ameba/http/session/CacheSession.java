@@ -14,8 +14,8 @@ public class CacheSession extends AbstractSession {
     private boolean fetched = false;
     private boolean isDelete = false;
 
-    protected CacheSession(String id, long timeout, boolean isNew) {
-        super(id, timeout, isNew);
+    protected CacheSession(String id, String host, long defaultTimeout, boolean isNew) {
+        super(id, host, defaultTimeout, isNew);
     }
 
     public static AbstractSession get(String id) {
@@ -27,30 +27,35 @@ public class CacheSession extends AbstractSession {
     }
 
     @Override
-    public void setAttribute(String key, Object value) {
-        getStore().attributes.put(key, value);
+    public void setAttribute(Object key, Object value) {
+        getStore().getAttributes().put(key, value);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <V> V getAttribute(String key) {
-        return (V) getStore().attributes.get(key);
+    public <V> V getAttribute(Object key) {
+        return (V) getStore().getAttributes().get(key);
     }
 
     @Override
-    public Map<String, Object> getAttributes() {
-        return getStore().attributes;
+    public Map<Object, Object> getAttributes() {
+        return getStore().getAttributes();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <V> V removeAttribute(String key) {
-        return (V) getStore().attributes.remove(key);
+    public <V> V removeAttribute(Object key) {
+        return (V) getStore().getAttributes().remove(key);
     }
 
     @Override
-    public long getSessionTimeout() {
-        return timeout;
+    public long getTimeout() {
+        return getStore().getTimeout();
+    }
+
+    @Override
+    public void setTimeout(long maxIdleTimeInMillis) {
+        getStore().setTimeout(maxIdleTimeInMillis);
     }
 
     @Override
@@ -72,16 +77,17 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public long getTimestamp() {
-        return getStore().timestamp;
+        return getStore().getTimeout();
     }
 
     @Override
     public void flush() {
         if (!isDelete && store == null)
             getStore();
-        if (store != null && store.isChange) {
-            store.isChange = false;
-            Cache.syncSet(getKey(), store, (int) (timeout * 1000));
+        if (store != null && store.isChange()) {
+            store.unchange();
+            store.updateLastAccessTime();
+            Cache.syncSet(getKey(), store, (int) (store.getTimeout() * 1000));
         }
     }
 
@@ -90,9 +96,19 @@ public class CacheSession extends AbstractSession {
         refresh(true);
     }
 
+    @Override
+    public void touch() {
+        Cache.touch(getKey(), (int) (getStore().getTimeout() * 1000));
+    }
+
+    @Override
+    public long getLastAccessTime() {
+        return getStore().getLastAccessTime();
+    }
+
     public void refresh(boolean force) {
         if (!fetched || force) {
-            store = Cache.gat(getKey(), (int) (timeout * 1000));
+            store = Cache.get(getKey());
             fetched = true;
         }
     }
@@ -104,9 +120,7 @@ public class CacheSession extends AbstractSession {
                     refresh(false);
                 }
                 if (store == null) {
-                    store = new SessionStore();
-                    store.timestamp = System.currentTimeMillis();
-                    store.isChange = true;
+                    store = new SessionStore(defaultTimeout);
                 }
             }
         }

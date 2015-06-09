@@ -1,5 +1,6 @@
 package ameba.http.session;
 
+import ameba.core.Requests;
 import ameba.util.Times;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
@@ -37,14 +38,19 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             cookie = newCookie(requestContext);
         }
         AbstractSession session;
+        String host = Requests.getRemoteRealAddr();
+        if (host.equals("unknown")) {
+            host = Requests.getRemoteAddr();
+        }
+        String sessionId = cookie.getValue();
         if (METHOD_HANDLE != null) {
             try {
-                session = (AbstractSession) METHOD_HANDLE.invoke(cookie.getValue(), SESSION_TIMEOUT, isNew);
+                session = (AbstractSession) METHOD_HANDLE.invoke(sessionId, host, SESSION_TIMEOUT, isNew);
             } catch (Throwable throwable) {
                 throw new SessionExcption("new session instance error");
             }
         } else {
-            session = new CacheSession(cookie.getValue(), SESSION_TIMEOUT, isNew);
+            session = new CacheSession(sessionId, host, SESSION_TIMEOUT, isNew);
         }
 
         if (!session.isNew() && session.isInvalid()) {

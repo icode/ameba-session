@@ -99,5 +99,6 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
         if (cookie != null)
             responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
+        Session.sessionThreadLocal.remove();
     }
 }

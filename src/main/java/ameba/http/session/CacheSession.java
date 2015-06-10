@@ -87,7 +87,7 @@ public class CacheSession extends AbstractSession {
         if (store != null && store.isChange()) {
             store.unchange();
             store.updateLastAccessTime();
-            Cache.syncSet(getKey(), store, (int) (store.getTimeout() * 1000));
+            Cache.syncSet(getKey(), store, (int) store.getTimeout());
         }
     }
 
@@ -98,7 +98,7 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public void touch() {
-        Cache.touch(getKey(), (int) (getStore().getTimeout() * 1000));
+        Cache.touch(getKey(), (int) getStore().getTimeout());
     }
 
     @Override

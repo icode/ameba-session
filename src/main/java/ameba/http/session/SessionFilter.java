@@ -72,18 +72,18 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
     }
 
     private NewCookie newCookie(ContainerRequestContext requestContext) {
-        URI uri = requestContext.getUriInfo().getBaseUri();
-        String domain = uri.getHost();
-        // localhost domain must be null
-        if (domain.equalsIgnoreCase("localhost")) {
-            domain = null;
-        }
+//        URI uri = requestContext.getUriInfo().getBaseUri();
+//        String domain = uri.getHost();
+//        // localhost domain must be null
+//        if (domain.equalsIgnoreCase("localhost")) {
+//            domain = null;
+//        }
 
         NewCookie cookie = new NewCookie(
                 DEFAULT_SESSION_ID_COOKIE_KEY,
                 newSessionId(),
                 "/",
-                domain,
+                null,
                 Cookie.DEFAULT_VERSION,
                 null,
                 COOKIE_MAX_AGE,

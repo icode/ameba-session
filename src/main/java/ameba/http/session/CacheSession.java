@@ -136,7 +136,7 @@ public class CacheSession extends AbstractSession {
 
     @Override
     protected void setId(String id) {
-        if (id != null && !getId().equals(id)) {
+        if (id != null && !id.equals(getId())) {
             super.setId(id);
             fetched = false;
             isDelete = false;

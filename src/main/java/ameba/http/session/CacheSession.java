@@ -82,12 +82,17 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public void flush() {
-        if (!isDelete && store == null)
-            getStore();
-        if (store != null && store.isChange()) {
-            store.unchange();
-            store.updateLastAccessTime();
-            Cache.syncSet(getKey(), store, (int) store.getTimeout());
+        if (!isDelete) {
+            if (store == null)
+                getStore();
+            if (store != null) {
+                if (store.isChange()) {
+                    store.unchange();
+                    Cache.syncSet(getKey(), store, (int) store.getTimeout());
+                } else {
+                    touch();
+                }
+            }
         }
     }
 
@@ -99,11 +104,6 @@ public class CacheSession extends AbstractSession {
     @Override
     public void touch() {
         Cache.touch(getKey(), (int) getStore().getTimeout());
-    }
-
-    @Override
-    public long getLastAccessTime() {
-        return getStore().getLastAccessTime();
     }
 
     public void refresh(boolean force) {

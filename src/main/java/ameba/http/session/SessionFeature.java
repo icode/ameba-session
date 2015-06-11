@@ -67,7 +67,7 @@ public class SessionFeature implements Feature {
         if (StringUtils.isNotBlank(time)) {
             time = StringUtils.deleteWhitespace(time);
             if (time.matches("^([0-9]+)(d|h|(mi?n)|s)$")) {
-                return Times.parseDuration(time) * 1000;
+                return Times.parseDuration(time);
             } else {
                 return Ints.tryParse(time);
             }

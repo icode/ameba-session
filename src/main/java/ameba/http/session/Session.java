@@ -118,10 +118,6 @@ public class Session {
         get().touch();
     }
 
-    public static long getLastAccessTime() {
-        return get().getLastAccessTime();
-    }
-
     public static String getHost() {
         return get().getHost();
     }

@@ -123,6 +123,4 @@ public abstract class AbstractSession {
     public String getHost() {
         return host;
     }
-
-    public abstract long getLastAccessTime();
 }

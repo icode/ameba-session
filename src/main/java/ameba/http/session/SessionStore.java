@@ -9,7 +9,6 @@ import java.util.Map;
  */
 class SessionStore implements Serializable {
     private transient boolean change = false;
-    private long lastAccessTime;
     private Map<Object, Object> attributes = new HashMap<Object, Object>() {
 
         @Override
@@ -44,7 +43,6 @@ class SessionStore implements Serializable {
         this.timestamp = System.currentTimeMillis();
         this.timeout = timeout;
         this.change = true;
-        this.lastAccessTime = timestamp;
     }
 
     public long getTimeout() {
@@ -72,11 +70,4 @@ class SessionStore implements Serializable {
         return timestamp;
     }
 
-    public long getLastAccessTime() {
-        return lastAccessTime;
-    }
-
-    public void updateLastAccessTime() {
-        this.lastAccessTime = System.currentTimeMillis();
-    }
 }

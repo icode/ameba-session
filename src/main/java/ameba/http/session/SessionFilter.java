@@ -13,7 +13,6 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import java.lang.invoke.MethodHandle;
-import java.net.URI;
 import java.util.UUID;
 
 /**
@@ -54,9 +53,14 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             session = new CacheSession(sessionId, host, SESSION_TIMEOUT, isNew);
         }
 
-        if (!session.isNew() && session.isInvalid()) {
-            cookie = newCookie(requestContext);
-            session.setId(cookie.getValue());
+        if (!session.isNew()) {
+            if (session.isInvalid()) {
+                cookie = newCookie(requestContext);
+                session.setId(cookie.getValue());
+            } else {
+                session.touch();
+                session.flush();
+            }
         }
 
         Session.sessionThreadLocal.set(session);

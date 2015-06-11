@@ -13,6 +13,7 @@ public class CacheSession extends AbstractSession {
     private SessionStore store;
     private boolean fetched = false;
     private boolean isDelete = false;
+    private boolean isTouch = false;
 
     protected CacheSession(String id, String host, long defaultTimeout, boolean isNew) {
         super(id, host, defaultTimeout, isNew);
@@ -89,8 +90,9 @@ public class CacheSession extends AbstractSession {
                 if (store.isChange()) {
                     store.unchange();
                     Cache.syncSet(getKey(), store, (int) store.getTimeout());
-                } else {
-                    touch();
+                } else if (isTouch) {
+                    isTouch = false;
+                    Cache.touch(getKey(), (int) getStore().getTimeout());
                 }
             }
         }
@@ -103,7 +105,7 @@ public class CacheSession extends AbstractSession {
 
     @Override
     public void touch() {
-        Cache.touch(getKey(), (int) getStore().getTimeout());
+        isTouch = true;
     }
 
     public void refresh(boolean force) {
@@ -131,4 +133,14 @@ public class CacheSession extends AbstractSession {
         return getKey(getId());
     }
 
+
+    @Override
+    protected void setId(String id) {
+        if (id != null && !getId().equals(id)) {
+            super.setId(id);
+            fetched = false;
+            isDelete = false;
+            isTouch = false;
+        }
+    }
 }

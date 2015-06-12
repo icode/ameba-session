@@ -69,19 +69,27 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
         if (!session.isNew()) {
             try {
-                if (session.isInvalid()) {
-                    cookie = newCookie(requestContext);
-                    session.setId(cookie.getValue());
-                } else {
-                    session.touch();
-                    session.flush();
-                }
+                checkSession(session, requestContext);
             } catch (Exception e) {
-                logger.warn("get session error", e);
+                try {
+                    checkSession(session, requestContext);
+                } catch (Exception ex) {
+                    logger.warn("get session error", e);
+                }
             }
         }
 
         Session.sessionThreadLocal.set(session);
+    }
+
+    private void checkSession(AbstractSession session, ContainerRequestContext requestContext) {
+        if (session.isInvalid()) {
+            Cookie cookie = newCookie(requestContext);
+            session.setId(cookie.getValue());
+        } else {
+            session.touch();
+            session.flush();
+        }
     }
 
     protected String newSessionId() {

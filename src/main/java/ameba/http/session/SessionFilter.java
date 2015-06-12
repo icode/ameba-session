@@ -1,14 +1,17 @@
 package ameba.http.session;
 
 import ameba.core.Requests;
+import ameba.mvc.assets.AssetsResource;
 import ameba.util.Times;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
 import javax.annotation.Priority;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
@@ -28,9 +31,19 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
     static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
     static MethodHandle METHOD_HANDLE;
 
+    @Context
+    private Provider<ResourceInfo> resourceInfoProvider;
+
+    private boolean isIgnore() {
+        return AssetsResource.class.isAssignableFrom(resourceInfoProvider.get().getResourceClass());
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void filter(ContainerRequestContext requestContext) {
+        if (isIgnore()) {
+            return;
+        }
         Cookie cookie = requestContext.getCookies().get(DEFAULT_SESSION_ID_COOKIE_KEY);
         boolean isNew = false;
         if (cookie == null) {
@@ -102,6 +115,9 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+        if (isIgnore()) {
+            return;
+        }
 
         Session.flush();
 

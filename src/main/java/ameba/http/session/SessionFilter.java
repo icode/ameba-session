@@ -7,15 +7,12 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
 import javax.annotation.Priority;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.*;
 import java.lang.invoke.MethodHandle;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,10 +29,11 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
     static MethodHandle METHOD_HANDLE;
 
     @Context
-    private Provider<ResourceInfo> resourceInfoProvider;
+    private UriInfo uriInfo;
 
     private boolean isIgnore() {
-        return AssetsResource.class.isAssignableFrom(resourceInfoProvider.get().getResourceClass());
+        List<Object> resources = uriInfo.getMatchedResources();
+        return resources.size() != 0 && AssetsResource.class.isAssignableFrom(resources.get(0).getClass());
     }
 
     @Override

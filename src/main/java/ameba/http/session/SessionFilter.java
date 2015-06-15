@@ -71,11 +71,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             try {
                 checkSession(session, requestContext);
             } catch (Exception e) {
-                try {
-                    checkSession(session, requestContext);
-                } catch (Exception ex) {
-                    logger.warn("get session error", e);
-                }
+                logger.warn("get session error", e);
             }
         }
 

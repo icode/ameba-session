@@ -48,7 +48,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         }
         Cookie cookie = requestContext.getCookies().get(SESSION_ID_COOKIE_KEY);
         boolean isNew = false;
-        if (cookie == null) {
+        if (cookie == null || Cookies.DELETED_COOKIE_VALUE.equals(cookie.getValue())) {
             isNew = true;
             cookie = newCookie(requestContext);
         }

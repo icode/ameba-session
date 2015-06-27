@@ -137,7 +137,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
         NewCookie cookie = (NewCookie) requestContext.getProperty(SET_COOKIE_KEY);
 
-        if (cookie == null && !Session.isInvalid()) {
+        if (cookie == null && Session.isInvalid()) {
             cookie = Cookies.newDeletedCookie(SESSION_ID_COOKIE_KEY);
         }
 

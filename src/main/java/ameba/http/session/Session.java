@@ -99,6 +99,11 @@ public class Session {
         get().invalidate();
     }
 
+
+    public static boolean isInvalid() {
+        return get().isInvalid();
+    }
+
     /**
      * @return the timestamp when this session has been created.
      */

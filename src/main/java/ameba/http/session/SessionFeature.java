@@ -23,7 +23,7 @@ public class SessionFeature implements Feature {
         if (!context.getConfiguration().isRegistered(SessionFilter.class)) {
             String key = (String) configuration.getProperty("http.session.cookie.key");
             if (StringUtils.isNotBlank(key)) {
-                SessionFilter.DEFAULT_SESSION_ID_COOKIE_KEY = key;
+                SessionFilter.SESSION_ID_COOKIE_KEY = key;
             }
             String sessionTimeout = (String) configuration.getProperty("http.session.timeout");
             try {

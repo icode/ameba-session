@@ -70,6 +70,9 @@ public class CacheSession extends AbstractSession {
         if (isNew) {
             return false;
         }
+        if (isDelete) {
+            return true;
+        }
         if (store == null) {
             refresh(false);
         }

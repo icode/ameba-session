@@ -2,6 +2,7 @@ package ameba.http.session;
 
 import ameba.core.Requests;
 import ameba.mvc.assets.AssetsResource;
+import ameba.util.Cookies;
 import ameba.util.Times;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
@@ -26,7 +27,7 @@ import java.util.UUID;
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
     private static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
-    static String DEFAULT_SESSION_ID_COOKIE_KEY = "s";
+    static String SESSION_ID_COOKIE_KEY = "s";
     static long SESSION_TIMEOUT = Times.parseDuration("2h");
     static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
     static MethodHandle METHOD_HANDLE;
@@ -45,7 +46,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         if (isIgnore()) {
             return;
         }
-        Cookie cookie = requestContext.getCookies().get(DEFAULT_SESSION_ID_COOKIE_KEY);
+        Cookie cookie = requestContext.getCookies().get(SESSION_ID_COOKIE_KEY);
         boolean isNew = false;
         if (cookie == null) {
             isNew = true;
@@ -106,7 +107,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 //        }
 
         NewCookie cookie = new NewCookie(
-                DEFAULT_SESSION_ID_COOKIE_KEY,
+                SESSION_ID_COOKIE_KEY,
                 newSessionId(),
                 "/",
                 null,
@@ -136,8 +137,12 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
         NewCookie cookie = (NewCookie) requestContext.getProperty(SET_COOKIE_KEY);
 
+        if (cookie == null && !Session.isInvalid()) {
+            cookie = Cookies.newDeletedCookie(SESSION_ID_COOKIE_KEY);
+        }
+
         if (cookie != null)
-            responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, cookie.toString());
+            responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, cookie);
         Session.sessionThreadLocal.remove();
     }
 }

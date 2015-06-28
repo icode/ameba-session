@@ -27,7 +27,7 @@ import java.util.UUID;
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
     private static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
-    private static final String EXECED_KEY = SessionFilter.class.getName() + ".EXECED_KEY";
+    private static final String EXECED_KEY = SessionFilter.class.getName() + ".EXECED";
     static String SESSION_ID_COOKIE_KEY = "s";
     static long SESSION_TIMEOUT = Times.parseDuration("2h");
     static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;

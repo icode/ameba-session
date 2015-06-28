@@ -27,6 +27,7 @@ import java.util.UUID;
 public class SessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger logger = LoggerFactory.getLogger(SessionFilter.class);
     private static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
+    private static final String EXECED_KEY = SessionFilter.class.getName() + ".EXECED_KEY";
     static String SESSION_ID_COOKIE_KEY = "s";
     static long SESSION_TIMEOUT = Times.parseDuration("2h");
     static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
@@ -46,6 +47,11 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         if (isIgnore()) {
             return;
         }
+        Boolean execed = (Boolean) requestContext.getProperty(EXECED_KEY);
+        if (execed != null) {
+            return;
+        }
+        requestContext.setProperty(EXECED_KEY, false);
         Cookie cookie = requestContext.getCookies().get(SESSION_ID_COOKIE_KEY);
         boolean isNew = false;
         if (cookie == null || Cookies.DELETED_COOKIE_VALUE.equals(cookie.getValue())) {
@@ -128,7 +134,11 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         if (isIgnore()) {
             return;
         }
-
+        Boolean execed = (Boolean) requestContext.getProperty(EXECED_KEY);
+        if (execed == null || execed) {
+            return;
+        }
+        requestContext.setProperty(EXECED_KEY, true);
         try {
             Session.flush();
         } catch (Exception e) {

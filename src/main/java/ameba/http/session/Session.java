@@ -1,5 +1,7 @@
 package ameba.http.session;
 
+import ameba.core.Requests;
+
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
@@ -8,11 +10,11 @@ import java.util.Map;
  */
 public class Session {
 
-    static final ThreadLocal<AbstractSession> sessionThreadLocal = new ThreadLocal<>();
+    public static final String REQ_KEY = Session.class.getName() + ".SESSION_VALUE";
     static MethodHandle GET_SESSION_METHOD_HANDLE;
 
     public static AbstractSession get() {
-        return sessionThreadLocal.get();
+        return (AbstractSession) Requests.getProperty(REQ_KEY);
     }
 
     public static AbstractSession get(String id) {

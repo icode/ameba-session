@@ -82,7 +82,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             }
         }
 
-        Session.sessionThreadLocal.set(session);
+        requestContext.setProperty(Session.REQ_KEY, session);
     }
 
     private void checkSession(AbstractSession session, ContainerRequestContext requestContext) {
@@ -153,6 +153,5 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
         if (cookie != null)
             responseContext.getHeaders().add(HttpHeaders.SET_COOKIE, cookie);
-        Session.sessionThreadLocal.remove();
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>org.amebastack.module</groupId>
     <artifactId>ameba-session</artifactId>
-    <version>0.1.7.Alpha1</version>
+    <version>0.1.7-SNAPSHOT</version>
 
 
     <name>Ameba-Framework-Session</name>

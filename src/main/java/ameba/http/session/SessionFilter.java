@@ -36,7 +36,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
     @Context
     private UriInfo uriInfo;
 
-    private boolean isIgnore() {
+    protected boolean isIgnore() {
         List<Object> resources = uriInfo.getMatchedResources();
         return resources.size() != 0 && AssetsResource.class.isAssignableFrom(resources.get(0).getClass());
     }

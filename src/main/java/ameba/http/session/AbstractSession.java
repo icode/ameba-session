@@ -1,8 +1,11 @@
 package ameba.http.session;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author icode
@@ -22,8 +25,24 @@ public abstract class AbstractSession {
         this.isNew = isNew;
     }
 
+    protected AbstractSession(String host, long defaultTimeout, boolean isNew) {
+        setId(newSessionId());
+        this.host = host;
+        this.defaultTimeout = defaultTimeout;
+        this.isNew = isNew;
+    }
+
     public static AbstractSession get(String id) {
         return null;
+    }
+
+    public static String newSessionId() {
+        return Hashing.murmur3_32()
+                .hashString(
+                        UUID.randomUUID().toString() + Math.random() + System.nanoTime(),
+                        Charsets.UTF_8
+                )
+                .toString();
     }
 
     /**
@@ -48,7 +67,6 @@ public abstract class AbstractSession {
      * @return an attribute
      */
     public abstract Map<Object, Object> getAttributes();
-
 
     /**
      * Remove an attribute.

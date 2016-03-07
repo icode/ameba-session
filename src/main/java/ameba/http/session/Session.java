@@ -1,7 +1,11 @@
 package ameba.http.session;
 
 import ameba.core.Requests;
+import ameba.util.Times;
+import com.google.common.collect.Maps;
 
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.NewCookie;
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
@@ -10,19 +14,69 @@ import java.util.Map;
  */
 public class Session {
 
-    public static final String REQ_KEY = Session.class.getName() + ".SESSION_VALUE";
+    public static final String REQ_SESSION_KEY = Session.class.getName() + ".SESSION_VALUE";
+    public static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
     static MethodHandle GET_SESSION_METHOD_HANDLE;
+    static MethodHandle NEW_SESSION_ID_METHOD_HANDLE;
+    static MethodHandle SESSION_CONSTRUCTOR_HANDLE;
+    static long SESSION_TIMEOUT = Times.parseDuration("2h");
+    static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
+    static String SESSION_ID_COOKIE_KEY = "s";
 
     public static AbstractSession get() {
-        return (AbstractSession) Requests.getProperty(REQ_KEY);
+        return get(true);
+    }
+
+    public static AbstractSession get(boolean create) {
+        AbstractSession session = (AbstractSession) Requests.getProperty(REQ_SESSION_KEY);
+        if (session == null && create && Requests.getRequest() != null) {
+            String sid;
+            try {
+                sid = (String) NEW_SESSION_ID_METHOD_HANDLE.invoke();
+            } catch (Throwable throwable) {
+                throw new SessionExcption(throwable);
+            }
+            NewCookie cookie = new NewCookie(
+                    SESSION_ID_COOKIE_KEY,
+                    sid,
+                    "/",
+                    null,
+                    Cookie.DEFAULT_VERSION,
+                    null,
+                    COOKIE_MAX_AGE,
+                    null,
+                    Requests.getSecurityContext().isSecure(),
+                    true);
+
+            Requests.setProperty(SET_COOKIE_KEY, cookie);
+
+            session = createSession(sid, Requests.getRemoteRealAddr(), true);
+            Requests.setProperty(REQ_SESSION_KEY, session);
+        }
+        return session;
     }
 
     public static AbstractSession get(String id) {
         try {
             return (AbstractSession) GET_SESSION_METHOD_HANDLE.invoke(id);
         } catch (Throwable throwable) {
-            return null;
+            throw new SessionExcption(throwable);
         }
+    }
+
+
+    static AbstractSession createSession(String sessionId, String host, boolean isNew) {
+        AbstractSession session;
+        if (SESSION_CONSTRUCTOR_HANDLE != null) {
+            try {
+                session = (AbstractSession) SESSION_CONSTRUCTOR_HANDLE.invoke(sessionId, host, SESSION_TIMEOUT, isNew);
+            } catch (Throwable throwable) {
+                throw new SessionExcption("new session instance error");
+            }
+        } else {
+            session = new CacheSession(sessionId, host, SESSION_TIMEOUT, isNew);
+        }
+        return session;
     }
 
     /**
@@ -42,7 +96,9 @@ public class Session {
      * @return an attribute
      */
     public static <V> V getAttribute(Object key) {
-        return get().getAttribute(key);
+        if (get(false) != null)
+            return get().getAttribute(key);
+        else return null;
     }
 
     /**
@@ -51,7 +107,9 @@ public class Session {
      * @return attributes
      */
     public static Map<Object, Object> getAttributes() {
-        return get().getAttributes();
+        if (get(false) != null)
+            return get().getAttributes();
+        else return Maps.newLinkedHashMap();
     }
 
 
@@ -62,7 +120,9 @@ public class Session {
      * @return true if successful.
      */
     public static <V> V removeAttribute(Object key) {
-        return get().removeAttribute(key);
+        if (get(false) != null)
+            return get().removeAttribute(key);
+        else return null;
     }
 
     /**
@@ -83,7 +143,7 @@ public class Session {
      * @return a long representing the maximum idle time (in milliseconds) a session can be.
      */
     public static long getTimeout() {
-        return get().getTimeout();
+        return get(false) != null ? get().getTimeout() : -1;
     }
 
     public static void setTimeout(long timeout) {
@@ -98,34 +158,38 @@ public class Session {
      *                               already invalidated session
      */
     public static void invalidate() {
-        get().invalidate();
+        if (get(false) != null)
+            get().invalidate();
     }
 
 
     public static boolean isInvalid() {
-        return get().isInvalid();
+        return get(false) == null || get().isInvalid();
     }
 
     /**
      * @return the timestamp when this session has been created.
      */
     public static long getTimestamp() {
-        return get().getTimestamp();
+        return get(false) != null ? get().getTimestamp() : -1;
     }
 
     public static void flush() {
-        get().flush();
+        if (get(false) != null)
+            get().flush();
     }
 
     public static void refresh() {
-        get().refresh();
+        if (get(false) != null)
+            get().refresh();
     }
 
     public static void touch() {
-        get().touch();
+        if (get(false) != null)
+            get().touch();
     }
 
     public static String getHost() {
-        return get().getHost();
+        return get(false) != null ? get().getHost() : null;
     }
 }

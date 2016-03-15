@@ -6,7 +6,7 @@
 
     <groupId>org.amebastack.module</groupId>
     <artifactId>ameba-session</artifactId>
-    <version>0.1.8-SNAPSHOT</version>
+    <version>0.1.8</version>
 
 
     <name>Ameba-Framework-Session</name>
@@ -136,8 +136,8 @@
     </dependencies>
 
     <properties>
-        <ameba.version>0.1.8-SNAPSHOT</ameba.version>
-        <ameba.cache.version>0.1.8-SNAPSHOT</ameba.cache.version>
+        <ameba.version>0.1.8</ameba.version>
+        <ameba.cache.version>0.1.8</ameba.cache.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>

@@ -30,15 +30,11 @@ public class Session {
     public static AbstractSession get(boolean create) {
         AbstractSession session = (AbstractSession) Requests.getProperty(REQ_SESSION_KEY);
         if (session == null && create && Requests.getRequest() != null) {
-            String sid;
-            try {
-                sid = (String) NEW_SESSION_ID_METHOD_HANDLE.invoke();
-            } catch (Throwable throwable) {
-                throw new SessionExcption(throwable);
-            }
+
+            session = create();
             NewCookie cookie = new NewCookie(
                     SESSION_ID_COOKIE_KEY,
-                    sid,
+                    session.getId(),
                     "/",
                     null,
                     Cookie.DEFAULT_VERSION,
@@ -47,10 +43,7 @@ public class Session {
                     null,
                     Requests.getSecurityContext().isSecure(),
                     true);
-
             Requests.setProperty(SET_COOKIE_KEY, cookie);
-
-            session = createSession(sid, Requests.getRemoteRealAddr(), true);
             Requests.setProperty(REQ_SESSION_KEY, session);
         }
         return session;
@@ -64,8 +57,31 @@ public class Session {
         }
     }
 
+    public static String generateId() {
+        try {
+            return (String) NEW_SESSION_ID_METHOD_HANDLE.invoke();
+        } catch (Throwable throwable) {
+            throw new SessionExcption(throwable);
+        }
+    }
 
-    static AbstractSession createSession(String sessionId, String host, boolean isNew) {
+    public static AbstractSession create() {
+        return create(generateId(), Requests.getRemoteRealAddr(), true);
+    }
+
+    public static AbstractSession create(String host) {
+        return create(generateId(), host, true);
+    }
+
+    public static AbstractSession create(String host, boolean isNew) {
+        return create(generateId(), host, isNew);
+    }
+
+    public static AbstractSession create(boolean isNew) {
+        return create(generateId(), Requests.getRemoteRealAddr(), isNew);
+    }
+
+    public static AbstractSession create(String sessionId, String host, boolean isNew) {
         AbstractSession session;
         if (SESSION_CONSTRUCTOR_HANDLE != null) {
             try {

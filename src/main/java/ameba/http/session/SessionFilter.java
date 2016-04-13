@@ -46,7 +46,7 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         if (cookie != null && !Cookies.DELETED_COOKIE_VALUE.equals(cookie.getValue())) {
             String host = Requests.getRemoteRealAddr();
             String sessionId = cookie.getValue();
-            AbstractSession session = Session.createSession(sessionId, host, false);
+            AbstractSession session = Session.create(sessionId, host, false);
             try {
                 checkSession(session, requestContext);
             } catch (Exception e) {

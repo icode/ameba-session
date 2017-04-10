@@ -28,7 +28,7 @@ public class Session {
     }
 
     public static AbstractSession get(boolean create) {
-        AbstractSession session = (AbstractSession) Requests.getProperty(REQ_SESSION_KEY);
+        AbstractSession session = Requests.getProperty(REQ_SESSION_KEY);
         if (session == null && create && Requests.getRequest() != null) {
 
             session = create();

@@ -20,7 +20,11 @@ public class CacheSession extends AbstractSession {
     }
 
     public static AbstractSession get(String id) {
-        return Cache.get(getKey(id));
+        AbstractSession session = Session.create(id, null, false);
+        if (!session.isInvalid()) {
+            return session;
+        }
+        return null;
     }
 
     private static String getKey(String id) {

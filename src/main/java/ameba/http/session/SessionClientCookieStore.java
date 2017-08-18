@@ -6,7 +6,7 @@ import ameba.util.Cookies;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 
-import static ameba.http.session.SessionFeature.SESSION_ID_COOKIE_KEY;
+import static ameba.http.session.SessionFeature.SESSION_ID_KEY;
 import static ameba.http.session.SessionFeature.SET_COOKIE_KEY;
 
 /**
@@ -15,7 +15,7 @@ import static ameba.http.session.SessionFeature.SET_COOKIE_KEY;
 public class SessionClientCookieStore implements SessionClientStore {
     @Override
     public String getToken() {
-        Cookie cookie = Requests.getCookies().get(SESSION_ID_COOKIE_KEY);
+        Cookie cookie = Requests.getCookies().get(SESSION_ID_KEY);
         if (cookie != null && !Cookies.DELETED_COOKIE_VALUE.equals(cookie.getValue())) {
             return cookie.getValue();
         }
@@ -24,13 +24,13 @@ public class SessionClientCookieStore implements SessionClientStore {
 
     @Override
     public void removeToken() {
-        Requests.setProperty(SET_COOKIE_KEY, Cookies.newDeletedCookie(SESSION_ID_COOKIE_KEY));
+        Requests.setProperty(SET_COOKIE_KEY, Cookies.newDeletedCookie(SESSION_ID_KEY));
     }
 
     @Override
     public void createToken(String token) {
         NewCookie cookie = new NewCookie(
-                SESSION_ID_COOKIE_KEY,
+                SESSION_ID_KEY,
                 token,
                 "/",
                 null,

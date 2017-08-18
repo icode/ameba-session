@@ -21,10 +21,26 @@ import java.lang.invoke.MethodType;
 public class SessionFeature implements Feature {
     public static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
     static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
-    static String SESSION_ID_COOKIE_KEY = "s";
+    static String SESSION_ID_KEY = "s";
 
     @Inject
     private InjectionManager injection;
+
+    public static int getCookieMaxAge() {
+        return COOKIE_MAX_AGE;
+    }
+
+    public static void setCookieMaxAge(int cookieMaxAge) {
+        COOKIE_MAX_AGE = cookieMaxAge;
+    }
+
+    public static String getSessionIdKey() {
+        return SESSION_ID_KEY;
+    }
+
+    public static void setSessionIdKey(String sessionIdKey) {
+        SESSION_ID_KEY = sessionIdKey;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -33,7 +49,7 @@ public class SessionFeature implements Feature {
         if (!context.getConfiguration().isRegistered(SessionFilter.class)) {
             String key = (String) configuration.getProperty("http.session.cookie.key");
             if (StringUtils.isNotBlank(key)) {
-                SESSION_ID_COOKIE_KEY = key;
+                SESSION_ID_KEY = key;
             }
             String sessionTimeout = (String) configuration.getProperty("http.session.timeout");
             try {

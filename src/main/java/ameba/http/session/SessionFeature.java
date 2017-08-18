@@ -20,26 +20,18 @@ import java.lang.invoke.MethodType;
  */
 public class SessionFeature implements Feature {
     public static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
-    static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
+    static int CLIENT_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
     static String SESSION_ID_KEY = "s";
 
     @Inject
     private InjectionManager injection;
 
-    public static int getCookieMaxAge() {
-        return COOKIE_MAX_AGE;
-    }
-
-    public static void setCookieMaxAge(int cookieMaxAge) {
-        COOKIE_MAX_AGE = cookieMaxAge;
+    public static int getClientMaxAge() {
+        return CLIENT_MAX_AGE;
     }
 
     public static String getSessionIdKey() {
         return SESSION_ID_KEY;
-    }
-
-    public static void setSessionIdKey(String sessionIdKey) {
-        SESSION_ID_KEY = sessionIdKey;
     }
 
     @Override
@@ -47,7 +39,7 @@ public class SessionFeature implements Feature {
     public boolean configure(FeatureContext context) {
         Configuration configuration = context.getConfiguration();
         if (!context.getConfiguration().isRegistered(SessionFilter.class)) {
-            String key = (String) configuration.getProperty("http.session.cookie.key");
+            String key = (String) configuration.getProperty("http.session.id.key");
             if (StringUtils.isNotBlank(key)) {
                 SESSION_ID_KEY = key;
             }
@@ -61,14 +53,14 @@ public class SessionFeature implements Feature {
                 throw new CacheException("http.session.timeout config error for [" + sessionTimeout + "] value.", e);
             }
 
-            String cookieMaxAge = (String) configuration.getProperty("http.session.cookie.maxAge");
+            String clientMaxAge = (String) configuration.getProperty("http.session.client.maxAge");
             try {
-                Integer maxAge = parseTime(cookieMaxAge);
+                Integer maxAge = parseTime(clientMaxAge);
                 if (maxAge != null) {
-                    COOKIE_MAX_AGE = maxAge;
+                    CLIENT_MAX_AGE = maxAge;
                 }
             } catch (Exception e) {
-                throw new CacheException("http.session.cookie.maxAge config error for [" + cookieMaxAge + "] value.", e);
+                throw new CacheException("http.session.client.maxAge config error for [" + clientMaxAge + "] value.", e);
             }
 
             String sessionClassStr = (String) configuration.getProperty("http.session.class");

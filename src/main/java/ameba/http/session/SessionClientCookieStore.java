@@ -36,7 +36,7 @@ public class SessionClientCookieStore implements SessionClientStore {
                 null,
                 Cookie.DEFAULT_VERSION,
                 null,
-                SessionFeature.COOKIE_MAX_AGE,
+                SessionFeature.CLIENT_MAX_AGE,
                 null,
                 Requests.getSecurityContext().isSecure(),
                 true);

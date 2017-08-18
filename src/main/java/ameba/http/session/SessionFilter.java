@@ -2,7 +2,7 @@ package ameba.http.session;
 
 import ameba.core.Requests;
 import ameba.mvc.assets.AssetsResource;
-import ameba.util.Cookies;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +10,13 @@ import javax.annotation.Priority;
 import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
+
+import static ameba.http.session.SessionFeature.SET_COOKIE_KEY;
 
 /**
  * @author icode
@@ -42,10 +47,9 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             return;
         }
         requestContext.setProperty(EXECED_KEY, false);
-        Cookie cookie = requestContext.getCookies().get(Session.SESSION_ID_COOKIE_KEY);
-        if (cookie != null && !Cookies.DELETED_COOKIE_VALUE.equals(cookie.getValue())) {
+        String sessionId = Session.CLIENT_STORE.getToken();
+        if (StringUtils.isNotBlank(sessionId)) {
             String host = Requests.getRemoteRealAddr();
-            String sessionId = cookie.getValue();
             AbstractSession session = Session.create(sessionId, host, false);
             try {
                 checkSession(session, requestContext);
@@ -79,10 +83,12 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
             logger.warn("flush session error", e);
         }
 
-        NewCookie cookie = (NewCookie) requestContext.getProperty(Session.SET_COOKIE_KEY);
+
+        NewCookie cookie = Requests.getProperty(SET_COOKIE_KEY);
 
         if (cookie == null && Session.isInvalid() && Session.get(false) != null) {
-            cookie = Cookies.newDeletedCookie(Session.SESSION_ID_COOKIE_KEY);
+            Session.CLIENT_STORE.removeToken();
+            cookie = Requests.getProperty(SET_COOKIE_KEY);
         }
 
         if (cookie != null)

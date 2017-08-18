@@ -5,10 +5,13 @@ import ameba.util.ClassUtils;
 import ameba.util.Times;
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.NewCookie;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
@@ -16,6 +19,13 @@ import java.lang.invoke.MethodType;
  * @author icode
  */
 public class SessionFeature implements Feature {
+    public static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
+    static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
+    static String SESSION_ID_COOKIE_KEY = "s";
+
+    @Inject
+    private InjectionManager injection;
+
     @Override
     @SuppressWarnings("unchecked")
     public boolean configure(FeatureContext context) {
@@ -23,7 +33,7 @@ public class SessionFeature implements Feature {
         if (!context.getConfiguration().isRegistered(SessionFilter.class)) {
             String key = (String) configuration.getProperty("http.session.cookie.key");
             if (StringUtils.isNotBlank(key)) {
-                Session.SESSION_ID_COOKIE_KEY = key;
+                SESSION_ID_COOKIE_KEY = key;
             }
             String sessionTimeout = (String) configuration.getProperty("http.session.timeout");
             try {
@@ -39,7 +49,7 @@ public class SessionFeature implements Feature {
             try {
                 Integer maxAge = parseTime(cookieMaxAge);
                 if (maxAge != null) {
-                    Session.COOKIE_MAX_AGE = maxAge;
+                    COOKIE_MAX_AGE = maxAge;
                 }
             } catch (Exception e) {
                 throw new CacheException("http.session.cookie.maxAge config error for [" + cookieMaxAge + "] value.", e);
@@ -54,6 +64,16 @@ public class SessionFeature implements Feature {
                     throw new SessionExcption("new session instance error");
                 }
             }
+            String storeClassStr = (String) configuration.getProperty("http.session.client.store.class");
+            Class storeClass = SessionClientCookieStore.class;
+            if (StringUtils.isNotBlank(storeClassStr)) {
+                try {
+                    storeClass = ClassUtils.getClass(storeClassStr);
+                } catch (ClassNotFoundException e) {
+                    throw new SessionExcption("new session instance error");
+                }
+            }
+            Session.CLIENT_STORE = (SessionClientStore) injection.createAndInitialize(storeClass);
             setSessionConstructorHandle(sessionClass);
             setGetSessionHandle(sessionClass);
             setNewSessionIdHandle(sessionClass);

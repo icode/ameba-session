@@ -4,8 +4,6 @@ import ameba.core.Requests;
 import ameba.util.Times;
 import com.google.common.collect.Maps;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.NewCookie;
 import java.lang.invoke.MethodHandle;
 import java.util.Map;
 
@@ -15,13 +13,11 @@ import java.util.Map;
 public class Session {
 
     public static final String REQ_SESSION_KEY = Session.class.getName() + ".SESSION_VALUE";
-    public static final String SET_COOKIE_KEY = SessionFilter.class.getName() + ".__SET_SESSION_COOKIE__";
     static MethodHandle GET_SESSION_METHOD_HANDLE;
     static MethodHandle NEW_SESSION_ID_METHOD_HANDLE;
     static MethodHandle SESSION_CONSTRUCTOR_HANDLE;
+    static SessionClientStore CLIENT_STORE;
     static long SESSION_TIMEOUT = Times.parseDuration("2h");
-    static int COOKIE_MAX_AGE = NewCookie.DEFAULT_MAX_AGE;
-    static String SESSION_ID_COOKIE_KEY = "s";
 
     public static AbstractSession get() {
         return get(true);
@@ -30,20 +26,8 @@ public class Session {
     public static AbstractSession get(boolean create) {
         AbstractSession session = Requests.getProperty(REQ_SESSION_KEY);
         if (session == null && create && Requests.getRequest() != null) {
-
             session = create();
-            NewCookie cookie = new NewCookie(
-                    SESSION_ID_COOKIE_KEY,
-                    session.getId(),
-                    "/",
-                    null,
-                    Cookie.DEFAULT_VERSION,
-                    null,
-                    COOKIE_MAX_AGE,
-                    null,
-                    Requests.getSecurityContext().isSecure(),
-                    true);
-            Requests.setProperty(SET_COOKIE_KEY, cookie);
+            CLIENT_STORE.createToken(session.getId());
             Requests.setProperty(REQ_SESSION_KEY, session);
         }
         return session;

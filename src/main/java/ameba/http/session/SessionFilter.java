@@ -3,10 +3,13 @@ package ameba.http.session;
 import ameba.core.Requests;
 import ameba.mvc.assets.AssetsResource;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.*;
@@ -30,6 +33,8 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
 
     @Context
     private UriInfo uriInfo;
+    @Inject
+    private ServiceLocator locator;
 
     protected boolean isIgnore() {
         List<Object> resources = uriInfo.getMatchedResources();
@@ -51,6 +56,8 @@ public class SessionFilter implements ContainerRequestFilter, ContainerResponseF
         if (StringUtils.isNotBlank(sessionId)) {
             String host = Requests.getRemoteRealAddr();
             AbstractSession session = Session.create(sessionId, host, false);
+            locator.postConstruct(session);
+            locator.inject(session);
             try {
                 checkSession(session, requestContext);
             } catch (Exception e) {

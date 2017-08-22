@@ -10,10 +10,10 @@ import java.util.Map;
 public class CacheSession extends AbstractSession {
     private static final String SESSION_PRE_KEY = CacheSession.class.getName() + ".__SESSION__.";
 
-    private SessionStore store;
-    private boolean fetched = false;
-    private boolean isDelete = false;
-    private boolean isTouch = false;
+    protected SessionStore store;
+    protected boolean fetched = false;
+    protected boolean isDelete = false;
+    protected boolean isTouch = false;
 
     protected CacheSession(String id, String host, long defaultTimeout, boolean isNew) {
         super(id, host, defaultTimeout, isNew);
@@ -122,7 +122,7 @@ public class CacheSession extends AbstractSession {
         }
     }
 
-    private SessionStore getStore() {
+    protected SessionStore getStore() {
         if (store == null) {
             synchronized (this) {
                 if (store == null) {

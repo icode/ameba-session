@@ -4,7 +4,6 @@ import ameba.core.Requests;
 import ameba.mvc.assets.AssetsResource;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

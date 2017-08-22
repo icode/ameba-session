@@ -15,7 +15,7 @@ public class CacheSession extends AbstractSession {
     protected boolean isDelete = false;
     protected boolean isTouch = false;
 
-    protected CacheSession(String id, String host, long defaultTimeout, boolean isNew) {
+    public CacheSession(String id, String host, long defaultTimeout, boolean isNew) {
         super(id, host, defaultTimeout, isNew);
     }
 

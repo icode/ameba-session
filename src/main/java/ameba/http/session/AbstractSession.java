@@ -17,7 +17,7 @@ public abstract class AbstractSession {
     protected String host;
     protected String id;
 
-    protected AbstractSession(String id, String host, long defaultTimeout, boolean isNew) {
+    public AbstractSession(String id, String host, long defaultTimeout, boolean isNew) {
         if (StringUtils.isBlank(id)) throw new SessionExcption("session id is invalid");
         setId(id);
         this.host = host;

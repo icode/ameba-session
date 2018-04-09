@@ -44,8 +44,9 @@ public class SessionFeature implements Feature {
                 SESSION_ID_KEY = key;
             }
             String sessionTimeout = (String) configuration.getProperty("http.session.timeout");
+            Integer timeout;
             try {
-                Integer timeout = parseTime(sessionTimeout);
+                timeout = parseTime(sessionTimeout);
                 if (timeout != null) {
                     Session.SESSION_TIMEOUT = timeout;
                 }
@@ -58,6 +59,8 @@ public class SessionFeature implements Feature {
                 Integer maxAge = parseTime(clientMaxAge);
                 if (maxAge != null) {
                     CLIENT_MAX_AGE = maxAge;
+                } else if (timeout != null) {
+                    CLIENT_MAX_AGE = timeout;
                 }
             } catch (Exception e) {
                 throw new CacheException("http.session.client.maxAge config error for [" + clientMaxAge + "] value.", e);
